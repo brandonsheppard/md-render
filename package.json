@@ -1,0 +1,34 @@
+{
+	"name": "md-render",
+	"version": "0.1.0",
+	"description": "Render Markdown into HTML with unconfigurable quirks.",
+	"type": "module",
+	"main": "src/index.js",
+	"exports": {
+		".": "./src/index.js"
+	},
+	"files": [
+		"src",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"test": "node --test",
+		"lint": "eslint .",
+		"prepack": "npm test"
+	},
+	"keywords": [
+		"markdown",
+		"html",
+		"renderer"
+	],
+	"author": "Brandon Sheppard",
+	"license": "MIT",
+	"engines": {
+		"node": ">=18"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"eslint": "^9.0.0"
+	}
+}
