@@ -133,6 +133,12 @@ function collectBlocks (lines) {
 			continue;
 		}
 
+		if (isPageBreakBlockStart(lines, index)) {
+			blocks.push({ type: 'pageBreak', lines: [ line ] });
+			index += 1;
+			continue;
+		}
+
 		if (line.trimStart().startsWith('```')) {
 			const block = [ line ];
 			index += 1;
@@ -227,10 +233,15 @@ function collectBlocks (lines) {
 
 function isSpecialBlockStart (lines, index) {
 	return lines[index].trimStart().startsWith('```') ||
+		isPageBreakBlockStart(lines, index) ||
 		isListLine(lines[index]) ||
 		isTableStart(lines, index) ||
 		/^ {0,3}>/.test(lines[index]) ||
 		isHtmlCommentLine(lines[index]);
+}
+
+function isPageBreakBlockStart (lines, index) {
+	return /^ {0,3}\+\+\+$/.test(lines[index]) && (index === 0 || lines[index - 1].trim() === '');
 }
 
 function isHtmlCommentLine (line) {
@@ -259,6 +270,10 @@ function renderBlock (block, state) {
 
 	if (/^ {0,3}(?:-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
 		return '<hr>';
+	}
+
+	if (block.type === 'pageBreak') {
+		return '<hr class="page-break">';
 	}
 
 	const heading = /^(#{1,6})\s+(.+)$/.exec(trimmed);

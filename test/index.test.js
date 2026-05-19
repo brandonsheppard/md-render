@@ -9,6 +9,30 @@ test('renders headings and paragraphs', () => {
 	assert.equal(html, '<h1 id="hello" tabindex="-1">Hello</h1>\n<p>This is <strong>fine</strong>.</p>');
 });
 
+test('renders ia writer page breaks', () => {
+	const html = renderMarkdown('Before\n\n+++\n\nAfter');
+
+	assert.equal(html, '<p>Before</p>\n<hr class="page-break">\n<p>After</p>');
+});
+
+test('renders ia writer page breaks before the next paragraph without a blank line', () => {
+	const html = renderMarkdown('Before\n\n+++\nAfter');
+
+	assert.equal(html, '<p>Before</p>\n<hr class="page-break">\n<p>After</p>');
+});
+
+test('does not render ia writer page breaks without a preceding blank line', () => {
+	const html = renderMarkdown('Before\n+++\nAfter');
+
+	assert.equal(html, '<p>Before\n+++\nAfter</p>');
+});
+
+test('does not render page breaks inside code fences', () => {
+	const html = renderMarkdown('```\n+++\n```');
+
+	assert.equal(html, '<pre><code>+++\n</code></pre>');
+});
+
 test('wraps single lines with <p>', () => {
 	const html = renderMarkdown('What -- the way?');
 

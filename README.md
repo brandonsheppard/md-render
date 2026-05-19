@@ -357,6 +357,32 @@ Markdown horizontal rules render as `<hr>`.
 <hr>
 ```
 
+### Page Breaks
+
+iA Writer-style page breaks render as an `<hr>` with a print/export styling hook. Write three plus marks on a line by themselves, after an empty line.
+
+```md
+Before
+
++++
+
+After
+```
+
+```html
+<p>Before</p>
+<hr class="page-break">
+<p>After</p>
+```
+
+Use CSS like this when printing or exporting the HTML:
+
+```css
+.page-break {
+	break-after: page;
+}
+```
+
 ### HTML Comments
 
 HTML comments are ignored.
