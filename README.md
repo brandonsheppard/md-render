@@ -499,6 +499,18 @@ B ← A
 A ↔ B
 ```
 
+Command key shortcuts become the command symbol:
+
+```md
+cmd-s
+Cmd Shift P
+```
+
+```html
+⌘-s
+⌘ Shift P
+```
+
 Circled number shortcuts are supported from `(1)` through `(20)`:
 
 ```md

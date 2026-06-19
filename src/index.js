@@ -722,6 +722,7 @@ function applyTypography (value) {
 		.replace(/(\d+)\/(\d+)/g, '$1 ÷ $2')
 		.replace(/(\d+)\*(\d+)/g, '$1 × $2')
 		.replace(/\b(\d+)-(\d+)\b/g, '$1–$2')
+		.replace(/\bcmd\b/gi, '⌘')
 		.replace(/\((\d{1,2})\)/g, (match, number) => CIRCLED_NUMBERS[Number(number)] || match)
 		.replace(/\.\.\./g, '…')
 		.replace(/--/g, '&mdash;')

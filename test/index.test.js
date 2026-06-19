@@ -63,6 +63,12 @@ test('renders ascii arrows', () => {
 	assert.equal(renderMarkdown('A <-> B'), '<p>A ↔ B</p>');
 });
 
+test('renders command key shortcuts', () => {
+	assert.equal(renderMarkdown('cmd-s'), '<p>⌘-s</p>');
+	assert.equal(renderMarkdown('Press Cmd Shift P'), '<p>Press ⌘ Shift P</p>');
+	assert.equal(renderMarkdown('cmdlet'), '<p>cmdlet</p>');
+});
+
 test('renders circled number shortcuts', () => {
 	const html = renderMarkdown('(1) Discover\n(2) Decide\n(10) Ship');
 
@@ -94,9 +100,9 @@ test('does not render spaced or non-numeric multiplication and division shortcut
 });
 
 test('does not run typography replacements inside code spans', () => {
-	const html = renderMarkdown('Use `--`, `...`, `3/4`, and `3*3` literally.');
+	const html = renderMarkdown('Use `--`, `...`, `3/4`, `3*3`, and `cmd` literally.');
 
-	assert.equal(html, '<p>Use <code>--</code>, <code>...</code>, <code>3/4</code>, and <code>3*3</code> literally.</p>');
+	assert.equal(html, '<p>Use <code>--</code>, <code>...</code>, <code>3/4</code>, <code>3*3</code>, and <code>cmd</code> literally.</p>');
 });
 
 test('inline does not wrap single lines with <p>', () => {
