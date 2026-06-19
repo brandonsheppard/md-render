@@ -60,6 +60,7 @@ function createSectionState (documentState, index = 0) {
 		footnotes: new Map(),
 		footnoteOrder: [],
 		footnoteNumbers: new Map(),
+		footnoteReferenceCounts: new Map(),
 		suffix: index === 0 ? '' : `-${ index + 1 }`
 	};
 }
@@ -678,11 +679,18 @@ function isSafeHref (href) {
 }
 
 function isRelativeHref (href) {
-	return href.startsWith('/');
+	return href.startsWith('/') || href.startsWith('#');
 }
 
 function renderAltText (value, state) {
-	return stripTags(renderInline(value, state).replace(/<sup class="footnote-ref"><a href="#fn\d+(?:-\d+)?" id="fnref(\d+)(?:-\d+)?">\d+<\/a><\/sup>/g, '. Source note $1.'));
+	const referenceCounts = state.footnoteReferenceCounts;
+	state.footnoteReferenceCounts = new Map(referenceCounts);
+
+	try {
+		return stripTags(renderInline(value, state).replace(/<sup class="footnote-ref"><a href="#fn(\d+)(?:-\d+)?"(?: id="fnref\d+(?:-\d+)?")?>\d+<\/a><\/sup>/g, '. Source note $1.'));
+	} finally {
+		state.footnoteReferenceCounts = referenceCounts;
+	}
 }
 
 function renderFootnoteRef (id, state) {
@@ -693,7 +701,10 @@ function renderFootnoteRef (id, state) {
 
 	const number = state.footnoteNumbers.get(id);
 	const suffix = state.suffix;
-	return `<sup class="footnote-ref"><a href="#fn${ number }${ suffix }" id="fnref${ number }${ suffix }">${ number }</a></sup>`;
+	const referenceCount = state.footnoteReferenceCounts.get(id) || 0;
+	const referenceId = referenceCount === 0 ? ` id="fnref${ number }${ suffix }"` : '';
+	state.footnoteReferenceCounts.set(id, referenceCount + 1);
+	return `<sup class="footnote-ref"><a href="#fn${ number }${ suffix }"${ referenceId }>${ number }</a></sup>`;
 }
 
 function renderFootnotes (state) {
@@ -719,7 +730,7 @@ function applyTypography (value) {
 		.replace(/&lt;-&gt;/g, '↔')
 		.replace(/-&gt;/g, '→')
 		.replace(/&lt;-/g, '←')
-		.replace(/(\d+)\/(\d+)/g, '$1 ÷ $2')
+		.replace(/(\d+)[ \t]+\/[ \t]+(\d+)/g, '$1 ÷ $2')
 		.replace(/(\d+)\*(\d+)/g, '$1 × $2')
 		.replace(/\b(\d+)-(\d+)\b/g, '$1–$2')
 		.replace(/\bcmd\b/gi, '⌘')

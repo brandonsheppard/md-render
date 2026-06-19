@@ -87,14 +87,15 @@ test('renders ellipses', () => {
 	assert.equal(html, '<p>Wait… what?</p>');
 });
 
-test('renders numbers-only multiplication and division shortcuts', () => {
+test('renders touching multiplication and spaced division shortcuts', () => {
 	assert.equal(renderMarkdown('3*3'), '<p>3 × 3</p>');
-	assert.equal(renderMarkdown('3/4'), '<p>3 ÷ 4</p>');
+	assert.equal(renderMarkdown('3 / 4'), '<p>3 ÷ 4</p>');
 });
 
-test('does not render spaced or non-numeric multiplication and division shortcuts', () => {
+test('does not render touching division or non-numeric math shortcuts', () => {
 	assert.equal(renderMarkdown('3 * 3'), '<p>3 * 3</p>');
-	assert.equal(renderMarkdown('3 / 4'), '<p>3 / 4</p>');
+	assert.equal(renderMarkdown('3/4'), '<p>3/4</p>');
+	assert.equal(renderMarkdown('ever since 9/11 this'), '<p>ever since 9/11 this</p>');
 	assert.equal(renderMarkdown('a/b'), '<p>a/b</p>');
 	assert.equal(renderMarkdown('path/to/file'), '<p>path/to/file</p>');
 });
@@ -142,6 +143,12 @@ test('renders relative links without a blank target', () => {
 	const html = renderMarkdown('[Internal](/page)');
 
 	assert.equal(html, '<p><a href="/page">Internal</a></p>');
+});
+
+test('renders fragment links without a blank target', () => {
+	const html = renderMarkdown('[Section](#this) [Placeholder](#)');
+
+	assert.equal(html, '<p><a href="#this">Section</a> <a href="#">Placeholder</a></p>');
 });
 
 test('renders unordered and ordered lists', () => {
@@ -221,6 +228,19 @@ test('renders footnote references in image alt captions', () => {
 </ol>`);
 });
 
+test('renders repeated footnote references in image alt text without another id', () => {
+	const markdown = `Read this[^1].
+
+![Chart[^1]](/chart.svg)
+
+[^1]: Source note.`;
+
+	const html = renderMarkdown(markdown);
+
+	assert.match(html, /<img src="\/chart\.svg" alt="Chart\. Source note 1\.">/);
+	assert.equal((html.match(/id="fnref1"/g) || []).length, 1);
+});
+
 test('renders fenced code blocks', () => {
 	const html = renderMarkdown(`\`\`\`
 this = 'some code';
@@ -293,6 +313,20 @@ test('renders footnote references and definitions', () => {
 <ol class="footnotes-list">
 <li id="fn1" class="footnote-item"><p><a href="/links/1325930171/">James Rosenquist</a>, Wikipedia.org. <a href="#fnref1" class="footnote-backref">↩︎</a></p></li>
 <li id="fn2" class="footnote-item"><p><a href="/links/1404623761/">Treat Big Tech like it’s Tobacco</a>, The Argument. <a href="#fnref2" class="footnote-backref">↩︎</a></p></li>
+</ol>`);
+});
+
+test('only adds a backref target id to the first reference of a footnote', () => {
+	const markdown = `Read this[^1] and then this again[^1].
+
+[^1]: Repeated note.`;
+
+	const html = renderMarkdown(markdown);
+
+	assert.equal(html, `<p>Read this<sup class="footnote-ref"><a href="#fn1" id="fnref1">1</a></sup> and then this again<sup class="footnote-ref"><a href="#fn1">1</a></sup>.</p>
+<h2>Footnotes</h2>
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>Repeated note. <a href="#fnref1" class="footnote-backref">↩︎</a></p></li>
 </ol>`);
 });
 

@@ -549,7 +549,7 @@ Numbers-only multiplication and division shortcuts become readable math:
 
 ```md
 3*3
-3/4
+3 / 4
 ```
 
 ```html
@@ -557,7 +557,7 @@ Numbers-only multiplication and division shortcuts become readable math:
 3 ÷ 4
 ```
 
-This only happens when the numbers touch. `3 * 3`, `3 / 4`, `a/b`, and `path/to/file` are left alone.
+Multiplication requires touching numbers, while division requires spaces around the slash. `3 * 3`, `3/4`, `9/11`, `a/b`, and `path/to/file` are left alone.
 
 ## Security Posture
 
@@ -565,7 +565,7 @@ This only happens when the numbers touch. `3 * 3`, `3 / 4`, `a/b`, and `path/to/
 
 It also filters dangerous link URLs. For example, `javascript:` links are rendered as plain text rather than clickable anchors.
 
-Links whose `href` starts with `/` are treated as relative and do not get `target="_blank"`. Everything else safe enough to render as a link gets `target="_blank"` and `rel="noopener noreferrer"`.
+Links whose `href` starts with `/` or `#` are treated as relative and do not get `target="_blank"`. Everything else safe enough to render as a link gets `target="_blank"` and `rel="noopener noreferrer"`.
 
 This does not make it a full HTML sanitizer. If you use the output in an unusual environment, you still need to understand that environment.
 
