@@ -602,15 +602,21 @@ function renderListNode (list, state, compact = false) {
 }
 
 function renderListItem (item, state, compact) {
-	const paragraphs = item.paragraphs.map((paragraph) => paragraph.join('\n').trim());
+	const paragraphs = item.paragraphs.map((paragraph, index) => {
+		const text = paragraph.join('\n').trim();
+		const task = index === 0 && /^\[([ xX])]([\t ]+|$)/.exec(text);
+		const checkbox = task ? `<input type="checkbox" disabled${ task[1] === ' ' ? '' : ' checked' }> ` : '';
+
+		return checkbox + renderInline(task ? text.slice(task[0].length) : text, state);
+	});
 
 	if (paragraphs.length > 1) {
-		const content = paragraphs.map((paragraph) => `<p>${ renderInline(paragraph, state) }</p>`).join('\n');
+		const content = paragraphs.map((paragraph) => `<p>${ paragraph }</p>`).join('\n');
 		const children = item.children.map((child) => renderListNode(child, state)).join('\n');
 		return `<li>\n${ content }${ children ? `\n${ children }` : '' }\n</li>`;
 	}
 
-	const text = renderInline(paragraphs[0] || '', state);
+	const text = paragraphs[0] || '';
 	const children = item.children.map((child) => renderListNode(child, state)).join('\n');
 
 	if (children) {

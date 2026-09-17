@@ -160,6 +160,13 @@ List items can also contain paragraphs:
 - Another item.
 ```
 
+Task-list markers at the start of a list item render as disabled checkboxes. Both `[x]` and `[X]` mean checked. This works in ordered and nested lists too.
+
+```md
+- [ ] unchecked
+- [x] checked
+```
+
 ### Blockquotes
 
 Blockquotes render as blockquotes with paragraph content.

@@ -160,6 +160,47 @@ test('supports heading id', () => {
 	assert.equal(renderMarkdown('## Hello World'), '<h2 id="hello-world" tabindex="-1">Hello World</h2>');
 });
 
+test('renders task lists as disabled checkboxes', () => {
+	assert.equal(
+		renderMarkdown('- [ ] unchecked\n- [x] checked'),
+		'<ul><li><input type="checkbox" disabled> unchecked</li><li><input type="checkbox" disabled checked> checked</li></ul>'
+	);
+	assert.equal(renderMarkdown('1. [X] Done'), '<ol><li><input type="checkbox" disabled checked> Done</li></ol>');
+	assert.equal(renderMarkdown('- [ ]'), '<ul><li><input type="checkbox" disabled> </li></ul>');
+});
+
+test('preserves inline formatting and escapes html in task lists', () => {
+	assert.equal(
+		renderMarkdown('- [x] **Done** [link](/page) <script>'),
+		'<ul><li><input type="checkbox" disabled checked> <strong>Done</strong> <a href="/page">link</a> &lt;script&gt;</li></ul>'
+	);
+});
+
+test('renders nested task items alongside ordinary items', () => {
+	assert.equal(
+		renderMarkdown('- Parent\n  * [ ] Child\n- Ordinary'),
+		'<ul>\n<li>Parent\n<ul>\n<li><input type="checkbox" disabled> Child</li>\n</ul>\n</li>\n<li>Ordinary</li>\n</ul>'
+	);
+});
+
+test('only converts the marker in the first paragraph of a list item', () => {
+	assert.equal(
+		renderMarkdown('- [x] First\n  continued\n\n  [ ] Second'),
+		'<ul>\n<li>\n<p><input type="checkbox" disabled checked> First\ncontinued</p>\n<p>[ ] Second</p>\n</li>\n</ul>'
+	);
+});
+
+test('leaves non-task markers and code unchanged', () => {
+	for (const text of [ '[x]word', '[yes] word', 'Later [x] word' ]) {
+		assert.equal(renderMarkdown(`- ${ text }`), `<ul><li>${ text }</li></ul>`);
+	}
+	assert.equal(renderMarkdown('- \\[x] literal'), '<ul><li>[x] literal</li></ul>');
+	assert.equal(renderMarkdown('- `[x] code`'), '<ul><li><code>[x] code</code></li></ul>');
+	assert.equal(renderMarkdown('[x] paragraph'), '<p>[x] paragraph</p>');
+	assert.equal(renderMarkdown('[x] inline', 'inline'), '[x] inline');
+	assert.equal(renderMarkdown('```\n- [x] code\n```'), '<pre><code>- [x] code\n</code></pre>');
+});
+
 test('disambiguates repeated heading ids', () => {
 	const html = renderMarkdown('## Same\n\n## Same\n\n### Same');
 
